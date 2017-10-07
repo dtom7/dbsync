@@ -40,10 +40,20 @@ public class DbSyncInitializer {
 	private String updateTemplate;
 
 	public void init() {
+		
+		LOGGER.info("dbSyncProperties: " + dbSyncProperties.toString());
+		
+		String queryAllColumns = "";
+		if(dbSyncProperties.getDatabaseVendor().equals("ORACLE")) {
+			queryAllColumns = "SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLUMNS where TABLE_NAME = '"
+					+ dbSyncProperties.getTableName() + "' ORDER BY COLUMN_ID";
+		} else {
+			queryAllColumns = "SELECT COLUMN_NAME, TYPE_NAME AS DATA_TYPE FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS where TABLE_SCHEM = 'SOURCE' AND TABLE_NAME = '"
+					+ dbSyncProperties.getTableName() + "'";
+		}
 
 		columnMetadataList = sourceJdbcTemplate
-				.query("SELECT COLUMN_NAME, DATA_TYPE FROM ALL_TAB_COLUMNS where TABLE_NAME = '"
-						+ dbSyncProperties.getTableName() + "' ORDER BY COLUMN_ID", new RowMapper<ColumnMetadata>() {
+				.query(queryAllColumns, new RowMapper<ColumnMetadata>() {
 							@Override
 							public ColumnMetadata mapRow(ResultSet rs, int rowNum) throws SQLException {
 								ColumnMetadata columnMetadata = new ColumnMetadata();
@@ -99,6 +109,8 @@ public class DbSyncInitializer {
 
 		StringBuilder insertSB = new StringBuilder();
 		insertSB.append("INSERT INTO ");
+		insertSB.append(dbSyncProperties.getTargetSchemaName());
+		insertSB.append(".");
 		insertSB.append(dbSyncProperties.getTableName());
 		insertSB.append("(");
 		insertSB.append(columnNames);
@@ -116,6 +128,8 @@ public class DbSyncInitializer {
 		StringBuilder updateTemplateSB = new StringBuilder();
 		comparisonSelectSB.append("SELECT ");
 		updateTemplateSB.append("UPDATE ");
+		updateTemplateSB.append(dbSyncProperties.getTargetSchemaName());
+		updateTemplateSB.append(".");
 		updateTemplateSB.append(dbSyncProperties.getTableName());
 		updateTemplateSB.append(" SET ");
 		for (String comparisonSelect : dbSyncProperties.getComparisonColumns()) {
@@ -130,6 +144,8 @@ public class DbSyncInitializer {
 		}
 		comparisonSelectSB.deleteCharAt(comparisonSelectSB.lastIndexOf(","));
 		comparisonSelectSB.append(" FROM ");
+		comparisonSelectSB.append(dbSyncProperties.getTargetSchemaName());
+		comparisonSelectSB.append(".");
 		comparisonSelectSB.append(dbSyncProperties.getTableName());
 		comparisonSelect = comparisonSelectSB.toString();
 		updateTemplateSB.deleteCharAt(updateTemplateSB.lastIndexOf(","));

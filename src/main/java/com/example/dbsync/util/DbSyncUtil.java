@@ -34,6 +34,8 @@ public class DbSyncUtil {
 		case "VARCHAR2":
 			strBuilder.replaceAll("*" + key + "*", "'" + value.toString() + "'");
 			break;
+		case "BIGINT":
+		case "INTEGER":
 		case "NUMBER":
 		case "LONG":
 			strBuilder.replaceAll("*" + key + "*", value.toString());
@@ -41,6 +43,7 @@ public class DbSyncUtil {
 		case "DATE":
 			strBuilder.replaceAll("*" + key + "*", "TO_DATE('" + value.toString() + "','DD-MON-RRRR')");
 			break;
+		case "TIMESTAMP":
 		case "TIMESTAMP(6)":
 			strBuilder.replaceAll("*" + key + "*", "TO_TIMESTAMP('" + value.toString() + "','DD-MON-RRRR HH.MI.SSXFF AM')");
 			break;

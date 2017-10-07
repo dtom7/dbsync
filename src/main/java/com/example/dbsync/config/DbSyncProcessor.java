@@ -38,7 +38,7 @@ public class DbSyncProcessor {
 	public void process() {
 
 		List<Map<String, Object>> sourceRows = sourceJdbcTemplate.queryForList(
-				"select " + dbSyncInitializer.getColumnSelect() + " from " + dbSyncProperties.getTableName());
+				"select " + dbSyncInitializer.getColumnSelect() + " from " + dbSyncProperties.getSourceSchemaName() + "." + dbSyncProperties.getTableName());
 		StrBuilder checkQuerySB = new StrBuilder();
 		for (Map<String, Object> sourceRow : sourceRows) {
 			checkQuerySB.clear();
@@ -90,11 +90,12 @@ public class DbSyncProcessor {
 	public boolean compare(Map<String, Object> sourceRow, Map<String, Object> targetRow) {
 		boolean result = true;
 		for (String key : targetRow.keySet()) {
-			LOGGER.info(" ** key: " + key + " -- ** value: " + sourceRow.get(key));
+			LOGGER.info(" ** key: " + key + " -- ** source value: " + sourceRow.get(key) + " -- ** target value: " + targetRow.get(key));
 			if (targetRow.get(key) == null || !targetRow.get(key).equals(sourceRow.get(key))) {
 				result = false;
 			}
 		}
+		LOGGER.info("result: " + result);
 		return result;
 	}
 
