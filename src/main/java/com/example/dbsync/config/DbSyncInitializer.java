@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import com.example.dbsync.util.DbSyncUtil;
+
 @Component
 public class DbSyncInitializer {
 
@@ -70,23 +72,7 @@ public class DbSyncInitializer {
 		StringBuilder columnValueSB = new StringBuilder();
 		for (ColumnMetadata columnMetadata : columnMetadataList) {
 			if (!dbSyncProperties.getExcludeColumns().contains(columnMetadata.getColumnName())) {
-				if (columnMetadata.getColumnType().equals("DATE")) {
-					columnSelectSB.append("TO_CHAR(");
-					columnSelectSB.append(columnMetadata.getColumnName());
-					columnSelectSB.append(",");
-					columnSelectSB.append("'DD-MON-RRRR')");
-					columnSelectSB.append(" AS ");
-					columnSelectSB.append(columnMetadata.getColumnName());
-				} else if (columnMetadata.getColumnType().equals("TIMESTAMP(6)")) {
-					columnSelectSB.append("TO_CHAR(");
-					columnSelectSB.append(columnMetadata.getColumnName());
-					columnSelectSB.append(",");
-					columnSelectSB.append("'DD-MON-RRRR HH.MI.SSXFF AM')");
-					columnSelectSB.append(" AS ");
-					columnSelectSB.append(columnMetadata.getColumnName());
-				} else {
-					columnSelectSB.append(columnMetadata.getColumnName());					
-				}
+				DbSyncUtil.convertSelectColumns(columnSelectSB, columnMetadata.getColumnType(), columnMetadata.getColumnName());
 				columnSelectSB.append(",");
 				columnNamesSB.append(columnMetadata.getColumnName());
 				columnNamesSB.append(",");
@@ -133,7 +119,7 @@ public class DbSyncInitializer {
 		updateTemplateSB.append(dbSyncProperties.getTableName());
 		updateTemplateSB.append(" SET ");
 		for (String comparisonSelect : dbSyncProperties.getComparisonColumns()) {
-			comparisonSelectSB.append(comparisonSelect);
+			DbSyncUtil.convertSelectColumns(comparisonSelectSB, DbSyncUtil.getColumnType(comparisonSelect, columnMetadataList), comparisonSelect);
 			comparisonSelectSB.append(",");
 			updateTemplateSB.append(comparisonSelect);
 			updateTemplateSB.append(" = ");

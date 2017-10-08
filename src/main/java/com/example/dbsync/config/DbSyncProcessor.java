@@ -36,9 +36,35 @@ public class DbSyncProcessor {
 	private List<String> updateList = new ArrayList<>();
 
 	public void process() {
-
-		List<Map<String, Object>> sourceRows = sourceJdbcTemplate.queryForList(
-				"select " + dbSyncInitializer.getColumnSelect() + " from " + dbSyncProperties.getSourceSchemaName() + "." + dbSyncProperties.getTableName());
+		List<Map<String, Object>> sourceRows = null;
+		String query = null;
+		if (dbSyncProperties.getDatabaseVendor().equals("ORACLE")) {
+			int rowCount = sourceJdbcTemplate.queryForObject("select count(*) from "
+					+ dbSyncProperties.getSourceSchemaName() + "." + dbSyncProperties.getTableName(), Integer.class);
+			LOGGER.info("rowCount: " + rowCount);
+			List<RowSelector> rowSelectorList = DbSyncUtil.getPaginationList(10, rowCount);
+			LOGGER.info("rowSelectorList size: " + rowSelectorList.size());
+			query = "select " + dbSyncInitializer.getColumnNames() + " from (" + "select "
+					+ dbSyncInitializer.getColumnSelect() + ",row_number() over (order by "
+					+ dbSyncProperties.getOrderByColumn() + ") r from " + dbSyncProperties.getSourceSchemaName() + "."
+					+ dbSyncProperties.getTableName() + ") where r between ? and ?";
+			LOGGER.info("query: " + query);
+			for (RowSelector rowSelector : rowSelectorList) {
+				LOGGER.info("rowSelector: " + rowSelector);
+				sourceRows = sourceJdbcTemplate.queryForList(query, new Object[] { rowSelector.getMin(), rowSelector.getMax() });
+				LOGGER.info("sourceRows size: " + (sourceRows != null ? sourceRows.size() : null));
+				processInternal(sourceRows);
+			}
+		} else {
+			query = "select " + dbSyncInitializer.getColumnSelect() + " from " + dbSyncProperties.getSourceSchemaName()
+					+ "." + dbSyncProperties.getTableName();
+			LOGGER.info("query: " + query);
+			sourceRows = sourceJdbcTemplate.queryForList(query);
+			processInternal(sourceRows);
+		}
+	}
+	
+	public void processInternal(List<Map<String, Object>> sourceRows) {
 		StrBuilder checkQuerySB = new StrBuilder();
 		for (Map<String, Object> sourceRow : sourceRows) {
 			checkQuerySB.clear();
@@ -68,8 +94,7 @@ public class DbSyncProcessor {
 				LOGGER.info("Final insert: " + insert);
 				insertList.add(insert);
 			}
-		}
-
+		}		
 	}
 
 	public String createInsert(Map<String, Object> sourceRow) {

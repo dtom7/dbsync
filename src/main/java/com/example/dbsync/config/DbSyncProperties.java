@@ -3,12 +3,9 @@ package com.example.dbsync.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 
 import com.example.dbsync.validation.ValidListOfString;
@@ -36,6 +33,8 @@ public class DbSyncProperties {
 	private String targetSchemaName;
 	@NotEmpty
 	private String tableName;
+	@NotEmpty
+	private String orderByColumn;
 	@NotEmpty
 	private String databaseVendor = "ORACLE";
 	@ValidListOfString
@@ -152,6 +151,14 @@ public class DbSyncProperties {
 	public void setExcludeColumns(List<String> excludeColumns) {
 		this.excludeColumns = excludeColumns;
 	}
+	
+	public String getOrderByColumn() {
+		return orderByColumn;
+	}
+
+	public void setOrderByColumn(String orderByColumn) {
+		this.orderByColumn = orderByColumn;
+	}
 
 	@Override
 	public String toString() {
@@ -159,8 +166,9 @@ public class DbSyncProperties {
 				+ ", sourceJdbcPassword=" + sourceJdbcPassword + ", targetJdbcUrl=" + targetJdbcUrl
 				+ ", targetJdbcUsername=" + targetJdbcUsername + ", targetJdbcPassword=" + targetJdbcPassword
 				+ ", sourceSchemaName=" + sourceSchemaName + ", targetSchemaName=" + targetSchemaName + ", tableName="
-				+ tableName + ", databaseVendor=" + databaseVendor + ", seletionColumns=" + seletionColumns
-				+ ", comparisonColumns=" + comparisonColumns + ", excludeColumns=" + excludeColumns + "]";
+				+ tableName + ", orderByColumn=" + orderByColumn + ", databaseVendor=" + databaseVendor
+				+ ", seletionColumns=" + seletionColumns + ", comparisonColumns=" + comparisonColumns
+				+ ", excludeColumns=" + excludeColumns + "]";
 	}
 
 }

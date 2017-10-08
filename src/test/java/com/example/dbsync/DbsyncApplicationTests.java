@@ -46,18 +46,18 @@ public class DbsyncApplicationTests {
 	
 	public void initVariables() {
 		targetTable = dbSyncProperties.getTargetSchemaName() + "." + dbSyncProperties.getTableName();
-		insert1 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST1',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,1)";
-		insert2 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST2',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,2)";
-		insert22 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST2',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,22)";
-		insert3 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST3',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,3)";
-		insert33 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST3',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,33)";
-		insert4 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnSelect() + ") VALUES ('TEST4',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,4)";		
+		insert1 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST1',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,1)";
+		insert2 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST2',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,2)";
+		insert22 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST2',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,22)";
+		insert3 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST3',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,3)";
+		insert33 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST3',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,33)";
+		insert4 = "INSERT INTO " + targetTable + "(" + dbSyncInitializer.getColumnNames() + ") VALUES ('TEST4',1,CURRENT_DATE,'test',CURRENT_TIMESTAMP,4)";		
 	}
 
 	@Before
 	public void init() {
-		initVariables();
 		dbSyncInitializer.init();
+		initVariables();
 		dbSyncProcessor.getInsertList().clear();
 		dbSyncProcessor.getUpdateList().clear();
 		targetJdbcTemplate.execute("DELETE FROM " + targetTable);

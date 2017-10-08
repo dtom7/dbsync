@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.dbsync.config.DbSyncInitializer;
 import com.example.dbsync.config.DbSyncProcessor;
+import com.example.dbsync.config.DbSyncWriter;
 
 @Component
 @Profile("!test")
@@ -21,6 +22,9 @@ public class DbSyncCommandLineRunner implements CommandLineRunner {
 
 	@Autowired
 	private DbSyncProcessor dbSyncProcessor;
+	
+	@Autowired
+	private DbSyncWriter dbSyncWriter;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -30,11 +34,13 @@ public class DbSyncCommandLineRunner implements CommandLineRunner {
 			dbSyncProcessor.process();
 			if (dbSyncProcessor.getInsertList().size() != 0) {
 				System.out.println("Inserts needed: " + dbSyncProcessor.getInsertList().size() + " ..");
+				dbSyncWriter.writeToFile(dbSyncProcessor.getInsertList(), "insert");
 			} else {
 				System.out.println("No inserts needed ..");
 			}
 			if (dbSyncProcessor.getUpdateList().size() != 0) {
 				System.out.println("Updates needed: " + dbSyncProcessor.getUpdateList().size() + " ..");
+				dbSyncWriter.writeToFile(dbSyncProcessor.getUpdateList(), "update");
 			} else {
 				System.out.println("No updates needed ..");
 			}

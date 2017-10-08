@@ -31,7 +31,7 @@ public class TestDataGenerator {
 		sourceRow.put("COLUMN2", 1);
 		sourceRow.put("COLUMN3", "28-SEP-2017");
 		sourceRow.put("COLUMN4", "test");
-		sourceRow.put("COLUMN6", "27-SEP-2017 12.50.54.160000 AM");
+		sourceRow.put("COLUMN6", "27-SEP-2017 12.50.54 AM");
 		sourceRow.put("COLUMN7", 1);
 	}
 
