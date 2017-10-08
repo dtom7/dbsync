@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>dbsync</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Utility program to sync up a table between 2 databases</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
